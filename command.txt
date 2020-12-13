@@ -1,0 +1,20 @@
+R := inputfromfile(sales.txt)
+
+R1 := select(R, time >= 66)
+R2 := select(R, pricerange = 2)
+R3 := SoRt(r, time)
+r4 := MOVSUM(R, time, 5)
+R5 := sort(r4, result)
+r6 := project(R, saleid, qty, customerid, time)
+r7   := concat(R,  r1   )
+r8:= select(r7, saleid = customerid)
+
+S:= inputfromfile(sales1.txt)
+s1 := sum(S, time)
+s2 := AVg(S, time)
+s3 := avggroup(S, qty, pricerange, time) 
+S4 := sort(S3,RESULT)
+
+T := join(R, S, R.saleid = S.customerid)
+T1 := PROJECT(T, R_saleid, S_customerid)
+

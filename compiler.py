@@ -2,7 +2,7 @@
 # import pandas as pd
 from sly import Lexer,Parser
 from table import Table, inputfromfile, outputtable
-from operation import project, select, sort, concat, column_sum, column_avg, sumgroup, avggroup, join, movsum, movavg
+from operation import project, select, sort, concat, column_sum, column_avg, sumgroup, avggroup, join, movsum, movavg, Hash
 
 class MyLexer(Lexer):
     tokens = { INPUT,OUTPUT,SELECT,PROJECT,AVGGROUP,AVG,SUMGROUP,SUM,SORT,JOIN,MOVAVG,MOVSUM,CONCAT,BTREE,HASH,COMP,OR,AND,NAME,NUMBER,DEFINE }
@@ -66,6 +66,10 @@ class MyParser(Parser):
             # print(self.names[expr])
 
     @_('HASH "(" NAME "," expr ")"')
+    def statement(self, p):
+        Hash(self.names[p.NAME.upper()], p.expr.upper())
+
+
     @_('BTREE "(" NAME "," expr ")"')
     def statement(self, p):
         self.names[p.NAME] = self.names[p.NAME].reset_index()
@@ -207,4 +211,5 @@ if __name__ == '__main__':
         if text:
             #for tok in lexer.tokenize(text):
             #    print(tok)
-            parser.parse(lexer.tokenize(text)) 
+            parser.parse(lexer.tokenize(text))
+            

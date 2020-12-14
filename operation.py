@@ -1,4 +1,5 @@
 from table import Table
+from hash import hashing
 import re
 
 def find_index(key, tup):  # key might be a value in tuple, tup is a tuple.
@@ -216,3 +217,10 @@ def movavg(S, C1, k):
             table.insert([int(sum(sum_list)/k)])
         i += 1
     return table
+
+def Hash(R, C1):
+    R.hash[C1] = hashing(R.size, R.data)
+    key = find_index(C1, R.column)
+    for Ri in range(0, R.size):
+        R.hash[C1].insert(R.data[Ri][key], Ri)
+        

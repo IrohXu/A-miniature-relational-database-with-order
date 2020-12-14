@@ -1,5 +1,3 @@
-# Group: xc2057, ch4019
-
 import re
 import time
 
@@ -13,9 +11,9 @@ class node(object):
         self.next = None
 
 class hashing(object):
-    def __init__(self, B):
+    def __init__(self, B, data):
         self.size = B
-        self.array = []
+        self.array = data
         self.dict = {}
         for i in range(0, self.size): self.dict[i] = None
     
@@ -25,83 +23,43 @@ class hashing(object):
     def _insert(self, key, value):
         dict_key = key%self.size
         if(self.dict[dict_key] is None):
-            index = self.length()
-            self.array.append((key,value))
-            self.dict[dict_key] = node(key, index)
-            tag = 1
+            self.dict[dict_key] = node(key, value)
         else:
-            head = self.dict[dict_key]
-            while(head.next != None):
-                if(head.key == key):
-                    self.array[head.pointer_index] = (key,value)    # Update the value
-                    break
-                else:
-                    head = head.next
-            if(head.key != key):
-                index = self.length()
-                self.array.append((key,value))
-                new_node = node(key, index)
-                head.next = new_node
-                tag = 1
-            else:
-                self.array[head.pointer_index] = (key,value)    # Update the value
-                tag = 0
-        return tag
+            new_node = node(key, value)
+            new_node.next = self.dict[dict_key]
+            self.dict[dict_key] = new_node
     
     def insert(self, key, value):
-        tag = self._insert(key, value)
-        if(tag == 1):
-            print("key: "+ str(key)+", value: "+str(value)+" is inserted/upserted successfully.")
-        else:
-            print("key: "+ str(key)+", value: "+str(value)+" is inserted/upserted successfully.")
+        self._insert(key, value)
 
     def _search(self, key):
         dict_key = key%self.size
         head = self.dict[dict_key]
+        output = []
         while(head != None):
             if(head.key == key):
-                return head.pointer_index
-            else:
-                head = head.next
-        return None
+                output.append(head.pointer_index)
+            head = head.next
+        return output
     
     def search(self, key):
-        tag = self._search(key)
-        if(tag == None):
-            print("The key is not existed.")
-        else:
-            key = self.array[tag][0]
-            value = self.array[tag][1]
-            print("key|value")
-            print(str(key)+"|"+str(value))
+        return self._search(key)
 
     def _delete(self, key):
         dict_key = key%self.size
         head = self.dict[dict_key]
-        if(head == None):
-            return None
-        if(head.key == key):
-            output = head.pointer_index
+        while(head != None and head.key == key):
             self.dict[dict_key] = head.next
-            return output
-        while(head.next != None):
-            if(head.next.key == key):
-                output = head.next.pointer_index
-                head.next = head.next.next
-                return output
-            else:
-                head = head.next
-        return None
+            head = head.next
+        if(head != None):
+            while(head.next != None):
+                if(head.next.key == key):
+                    head.next = head.next.next
+                else:
+                    head = head.next
     
     def delete(self, key):
-        tag = self._delete(key)
-        if(tag == None):
-            # print("The delete operation failed.")
-            print("The key is not existed.")
-        else:
-            k_v = self.array[tag]
-            self.array[tag] = None
-            print("key: "+str(k_v[0])+", and value: "+str(k_v[1])+" is removed.")
+        self._delete(key)
     
     def visualization(self):
         for dict_key in self.dict:
@@ -119,47 +77,26 @@ class hashing(object):
             while(head != None):
                 print(str(self.array[head.pointer_index][0]) + "|" + str(self.array[head.pointer_index][1]))
                 head = head.next
-
+    
     def load_table(self, table_path):
         fd = open(table_path)
-        first_line = fd.readline()    # first line is key|value, do not need it
+        fd.readline()    # first line is key|value, do not need it
+        i = 0
         while(True):
             line = fd.readline()
             if(line == ""):
                 break
             info = line.split('|')
-            self._insert(int(info[0]), int(info[1]))
-    
-    def load_command(self, command_path):
-        fd = open(command_path)
-        while(True):
-            line = fd.readline()
-            if(line == ""):
-                break
-            matchObj = re.match( r'[a-z]*', line, re.I)
-            num = re.findall(r'\d+', line)
-            if(matchObj):
-                command = matchObj.group()
-            if(command == 'insert'):
-                key = int(num[0])
-                value = int(num[1])
-                self.insert(key, value)
-            elif(command == 'delete'):
-                key = int(num[0])
-                self.delete(key)
-            elif(command == 'search'):
-                key = int(num[0])
-                self.search(key)
-            else:
-                print("Wrong command, command should be insert, delete or search")
-
+            self.array.append(info)
+            self.insert(int(info[0]), i)
+            i+=1
 
 if __name__ == '__main__':
     ticks = time.time()
-    h = hashing(100000)     #  You can change the size.
+    h = hashing(10, [])
     input_table = './myIndex.txt'
-    input_command = './myCommand.txt'
     h.load_table(input_table)
-    h.load_command(input_command)
+    h.visualization()
+
     print('\nTotal time used include insert data and exec commands is',(time.time()-ticks))
     # h.search_all()    # Print all

@@ -1,15 +1,18 @@
+# -----------------------------------------------------------------------------
+# xc2057
+# Bptree.py
+# -----------------------------------------------------------------------------
+
+
 from bisect import bisect_right,bisect_left
 from tree_node import leaf_node, inter_node
 import re
 
 class Bplus_Tree(object):
-    def __init__(self, k, data):
+    def __init__(self, k):
         self.min_size = k
         self.max_size = 2*k-1
         self.root = leaf_node(self.min_size)
-        self.array = data      # Use this array to store key-value
-    
-    def length(self):   return len(self.array)
 
     def _search(self, key, node):
         output = None
@@ -27,11 +30,9 @@ class Bplus_Tree(object):
         node = self.root
         output = self._search(key, node)
         return output
-        # Remember: output is an array; it store pointer to real data array.
     
     def leaf_insert(self, key, value, node):
         if(node.node_set == []):
-            # self.array.append((key, value))
             node.node_set.append((key, [value]))
         else:
             for i in range(0, len(node.node_set)):
@@ -110,7 +111,6 @@ class Bplus_Tree(object):
             if(k_v[0] == key): break
         if(k_v[0] == key):
             node.node_set.remove(k_v)
-            # print("key: "+str(self.array[k_v[1]][0])+", and value: "+str(self.array[k_v[1]][1])+" is removed.")
     
     def left_borrow(self, node, i, pointer, left_pointer):
         if(pointer.is_leaf()):
@@ -205,7 +205,7 @@ class Bplus_Tree(object):
             pointer = node.pointer_set[i]
             return self._leaf_localization(key, pointer)
 
-    # output the key-value lower than one key.
+    # output the key-value lower than one key.  <
     def range_search_low(self, key):
         output = []
         tag_node = self._leaf_localization(key, self.root)
@@ -218,11 +218,11 @@ class Bplus_Tree(object):
                 for v in k_v[1]: output.append(v)
             node = node.brother
         for k_v in node.node_set:
-            if(k_v[0] > key): break
+            if(k_v[0] >= key): break
             for v in k_v[1]: output.append(v)
         return output
     
-    # output the key-value greater than one key.
+    # output the key-value greater than one key.   >
     def range_search_up(self, key):
         output = []
         tag_node = self._leaf_localization(key, self.root)
@@ -235,62 +235,15 @@ class Bplus_Tree(object):
                 for v in k_v[1]: output.append(v)
             node = node.brother
         return output
-
-    def search_all(self):
+    
+    def index_sort(self):
+        output = []
         node = self.root
-        print("Key|Value")
         while(node.is_leaf() == False):
             node = node.pointer_set[0]
         while(node != None):
-            self.vis_leaf_node(node)
+            for k_v in node.node_set:
+                output += k_v[1]
             node = node.brother
-    
-    def load_table(self, table_path):
-        fd = open(table_path)
-        fd.readline()    # first line is key|value, do not need it
-        i = 0
-        while(True):
-            line = fd.readline()
-            if(line == ""):
-                break
-            info = line.split('|')
-            self.array.append(info)
-            self.insert(int(info[0]), i)
-            i+=1
-    
-    def load_command(self, command_path):
-        fd = open(command_path)
-        while(True):
-            line = fd.readline()
-            if(line == ""):
-                break
-            matchObj = re.match( r'[a-z]*', line, re.I)
-            num = re.findall(r'\d+', line)
-            if(matchObj):
-                command = matchObj.group()
-            if(command == 'insert'):
-                key = int(num[0])
-                value = int(num[1])
-                self.insert(key, value)
-            elif(command == 'delete'):
-                key = int(num[0])
-                self.delete(key)
-            elif(command == 'search'):
-                key = int(num[0])
-                self.search(key)
-            else:
-                print("Wrong command, command should be insert, delete or search")
-
-if __name__ == "__main__":
-    T = Bplus_Tree(3, [])    #  The k of the tree can be changed.
-    input_table = './myIndex.txt'
-    input_command = './myCommand.txt'
-    T.load_table(input_table)
-    for i in T.search(2):
-        print(T.array[i])
-    T.delete(2)
-    print(T.range_search_low(50))
-    print(T.range_search_up(50))
-    # T.load_command(input_command)
-    # T.search_all()  # Print all
+        return output
     

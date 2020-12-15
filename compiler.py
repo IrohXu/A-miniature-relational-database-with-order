@@ -1,8 +1,13 @@
+# -----------------------------------------------------------------------------
+# xc2057
+# compiler.py
+# -----------------------------------------------------------------------------
+
 #!/usr/bin/env python3
-# import pandas as pd
+import time
 from sly import Lexer,Parser
 from table import Table, inputfromfile, outputtable
-from operation import project, select, sort, concat, column_sum, column_avg, sumgroup, avggroup, join, movsum, movavg
+from operation import project, select, sort, concat, column_sum, column_avg, sumgroup, avggroup, join, movsum, movavg, Hash, Btree
 
 class MyLexer(Lexer):
     tokens = { INPUT,OUTPUT,SELECT,PROJECT,AVGGROUP,AVG,SUMGROUP,SUM,SORT,JOIN,MOVAVG,MOVSUM,CONCAT,BTREE,HASH,COMP,OR,AND,NAME,NUMBER,DEFINE }
@@ -66,11 +71,16 @@ class MyParser(Parser):
             # print(self.names[expr])
 
     @_('HASH "(" NAME "," expr ")"')
+    def statement(self, p):
+        Hash(self.names[p.NAME.upper()], p.expr.upper())
+
+
     @_('BTREE "(" NAME "," expr ")"')
     def statement(self, p):
-        self.names[p.NAME] = self.names[p.NAME].reset_index()
-        self.names[p.NAME] = self.names[p.NAME].set_index(p.expr)
-        self.names[p.NAME] = self.names[p.NAME].sort_index() 
+        Btree(self.names[p.NAME.upper()], p.expr.upper())
+        # self.names[p.NAME] = self.names[p.NAME].reset_index()
+        # self.names[p.NAME] = self.names[p.NAME].set_index(p.expr)
+        # self.names[p.NAME] = self.names[p.NAME].sort_index() 
     
     @_('OUTPUT "(" NAME ")"')
     def statement(self, p):
@@ -207,4 +217,7 @@ if __name__ == '__main__':
         if text:
             #for tok in lexer.tokenize(text):
             #    print(tok)
-            parser.parse(lexer.tokenize(text)) 
+            ticks = time.time()
+            parser.parse(lexer.tokenize(text))
+            print('('+str(time.time()-ticks)+' sec)')
+            

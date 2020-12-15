@@ -1,3 +1,8 @@
+# -----------------------------------------------------------------------------
+# xc2057
+# table.py
+# -----------------------------------------------------------------------------
+
 import re
 
 class Table():
@@ -5,6 +10,11 @@ class Table():
         self.column = column   # column should be a list
         self.data = []   # data in the table should be list
         self.size = 0
+        self.hash = {}
+        self.bptree = {}
+        for c in column:
+            self.hash[c] = None
+            self.bptree[c] = None
     
     def insert(self, row):
         self.data.append(row)
@@ -40,4 +50,3 @@ def outputtofile(table):  # table is a table class
         if info == None: continue
         standardout = '|'.join([str(x) for x in info])
         print(standardout)
-

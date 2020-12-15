@@ -17,4 +17,5 @@ S4 := sort(S3,RESULT)
 
 T := join(R, S, R.saleid = S.customerid)
 T1 := PROJECT(T, R_saleid, S_customerid)
+HASH(S, SALEID)
 

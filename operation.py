@@ -1,12 +1,5 @@
-# -----------------------------------------------------------------------------
-# xc2057
-# operation.py
-# -----------------------------------------------------------------------------
-
-
 from table import Table
 from hash import hashing
-from Bptree import Bplus_Tree
 import re
 
 def find_index(key, tup):  # key might be a value in tuple, tup is a tuple.
@@ -67,51 +60,15 @@ def select(S, condition):
         elif(c1 in S.column):  # c2 might be a constant
             c1_key = find_index(c1, S.column)
             c2 = int(c2)
-            if(S.hash[c1] != None and comp in ['=', '==']):    # Use hash
-                row_set = S.hash[c1].search(c2)
-                for pointer in row_set:
-                    table.insert(S.data[pointer])
-            elif(S.bptree[c1] != None and comp in ['>', '>=', '<', '<=']):
-                if(comp in ['>', '>=']):
-                    row_set = S.bptree[c1].range_search_up(c2)
-                    if(comp == '>='):
-                        row_set = S.bptree[c1].search(c2) + row_set
-                    for pointer in row_set:
-                        table.insert(S.data[pointer])
-                else: # comp in ['<', '<=']
-                    row_set = S.bptree[c1].range_search_low(c2)
-                    if(comp == '<='):
-                        row_set = row_set + S.bptree[c1].search(c2)
-                    for pointer in row_set:
-                        table.insert(S.data[pointer])
-            else:
-                for row in S.data:
-                    if(row == None): continue
-                    if(compare(row[c1_key], comp, c2)): table.insert(row)
+            for row in S.data:
+                if(row == None): continue
+                if(compare(row[c1_key], comp, c2)): table.insert(row)
         elif(c2 in S.column):  # c2 might be a constant
             c2_key = find_index(c2, S.column)
             c1 = int(c1)
-            if(S.hash[c2] != None and comp in ['=', '==']):   # Use hash
-                row_set = S.hash[c2].search(c1)
-                for pointer in row_set:
-                    table.insert(S.data[pointer])
-            elif(S.bptree[c2] != None and comp in ['>', '>=', '<', '<=']):
-                if(comp in ['>', '>=']):
-                    row_set = S.btree[c2].range_search_low(c1)
-                    if(comp == '>='):
-                        row_set = S.btree[c2].search(c1) + row_set
-                    for pointer in row_set:
-                        table.insert(S.data[pointer])
-                else: # comp in ['<', '<=']
-                    row_set = S.btree[c2].range_search_up(c1)
-                    if(comp == '<='):
-                        row_set = row_set + S.btree[c2].search(c1)
-                    for pointer in row_set:
-                        table.insert(S.data[pointer])
-            else:
-                for row in S.data:
-                    if(row == None): continue
-                    if(compare(c1, comp, row[c1_key])): table.insert(row)
+            for row in S.data:
+                if(row == None): continue
+                if(compare(c1, comp, row[c1_key])): table.insert(row)
         else:
             raise SyntaxError("Wrong condition setting.")
     else:
@@ -122,14 +79,9 @@ def sort(S, C1):
     table = Table(S.column)  # The returned new table
     New_data = list(filter(None, S.data))  # delete the memory if there is any None value
     key = find_index(C1, S.column)
-    if(S.bptree[C1] != None):
-        row_set = S.bptree[C1].index_sort()
-        for pointer in row_set:
-            table.insert(S.data[pointer])
-    else:
-        New_data.sort(key = lambda elem: elem[key], reverse=False)
-        table.data = New_data
-        table.size = len(table.data)
+    New_data.sort(key = lambda elem: elem[key], reverse=False)
+    table.data = New_data
+    table.size = len(table.data)
     return table
 
 def concat(R, S):
@@ -267,14 +219,8 @@ def movavg(S, C1, k):
     return table
 
 def Hash(R, C1):
-    R.hash[C1] = hashing(R.size)
+    R.hash[C1] = hashing(R.size, R.data)
     key = find_index(C1, R.column)
     for Ri in range(0, R.size):
         R.hash[C1].insert(R.data[Ri][key], Ri)
-
-def Btree(R, C1):
-    R.bptree[C1] = Bplus_Tree(53)   # TEMP use 23 here, you can change it.
-    key = find_index(C1, R.column)
-    for Ri in range(0, R.size):
-        R.bptree[C1].insert(R.data[Ri][key], Ri)
         

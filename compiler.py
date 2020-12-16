@@ -6,7 +6,7 @@
 #!/usr/bin/env python3
 import time
 from sly import Lexer,Parser
-from table import Table, inputfromfile, outputtable
+from table import Table, inputfromfile, outputtable, outputtofile
 from operation import project, select, sort, concat, column_sum, column_avg, sumgroup, avggroup, join, movsum, movavg, Hash, Btree
 
 class MyLexer(Lexer):
@@ -85,7 +85,7 @@ class MyParser(Parser):
     @_('OUTPUT "(" NAME ")"')
     def statement(self, p):
         name = p.NAME.upper()
-        outputtable(self.names[name])
+        outputtofile(self.names[name], name+".txt")
         # self.names[p.NAME0].to_csv(p.NAME1,sep='|',index=False)
 
     # @_('OUTPUT "(" NAME "," NAME ")"')
@@ -217,7 +217,7 @@ if __name__ == '__main__':
         if text:
             #for tok in lexer.tokenize(text):
             #    print(tok)
-            ticks = time.time()
+            ticks = time.time()       # Add time counter
             parser.parse(lexer.tokenize(text))
-            print('('+str(time.time()-ticks)+' sec)')
+            print('('+str(time.time()-ticks)+' sec)')  # Print time by (xxx sec)
             

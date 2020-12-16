@@ -71,8 +71,12 @@ def select(S, condition):
                 row_set = S.hash[c1].search(c2)
                 for pointer in row_set:
                     table.insert(S.data[pointer])
-            elif(S.bptree[c1] != None and comp in ['>', '>=', '<', '<=']):
-                if(comp in ['>', '>=']):
+            elif(S.bptree[c1] != None and comp in ['>', '>=', '<', '<=', '=', '==']):
+                if(comp in ['==', '=']):
+                    row_set = S.bptree[c1].search(c2)
+                    for pointer in row_set:
+                        table.insert(S.data[pointer])
+                elif(comp in ['>', '>=']):
                     row_set = S.bptree[c1].range_search_up(c2)
                     if(comp == '>='):
                         row_set = S.bptree[c1].search(c2) + row_set
@@ -96,7 +100,11 @@ def select(S, condition):
                 for pointer in row_set:
                     table.insert(S.data[pointer])
             elif(S.bptree[c2] != None and comp in ['>', '>=', '<', '<=']):
-                if(comp in ['>', '>=']):
+                if(comp in ['==', '=']):
+                    row_set = S.bptree[c2].search(c1)
+                    for pointer in row_set:
+                        table.insert(S.data[pointer])
+                elif(comp in ['>', '>=']):
                     row_set = S.btree[c2].range_search_low(c1)
                     if(comp == '>='):
                         row_set = S.btree[c2].search(c1) + row_set

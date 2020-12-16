@@ -1,8 +1,9 @@
 # -----------------------------------------------------------------------------
 # xc2057
 # hash.py
+# hash has insert, search, delete operation. 
+# In our project, we only use insert and search.
 # -----------------------------------------------------------------------------
-
 
 class node(object):
     def __init__(self, key, index):
@@ -40,6 +41,26 @@ class hashing(object):
                 output.append(head.pointer_index)
             head = head.next
         return output
+    
+    def search(self, key):
+        return self._search(key)
+
+    def _delete(self, key):
+        dict_key = key%self.size
+        head = self.dict[dict_key]
+        while(head != None and head.key == key):
+            self.dict[dict_key] = head.next
+            head = head.next
+        if(head != None):
+            while(head.next != None):
+                if(head.next.key == key):
+                    head.next = head.next.next
+                else:
+                    head = head.next
+    
+    def delete(self, key):
+        self._delete(key)
+
     
     def search(self, key):
         return self._search(key)

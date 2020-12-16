@@ -1,11 +1,8 @@
 # -----------------------------------------------------------------------------
 # xc2057
 # tree_node.py
+# Tree node for B+ tree.
 # -----------------------------------------------------------------------------
-
-'''
-Tree node class in B+ Tree
-'''
 
 class leaf_node(object):
     def __init__(self, k):
@@ -76,3 +73,4 @@ class inter_node(object):
     def find_max(self):
         if(self.key_set == []): return None
         return max(self.key_set)
+    

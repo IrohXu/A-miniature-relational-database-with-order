@@ -111,7 +111,7 @@ def select(S, condition):
             else:
                 for row in S.data:
                     if(row == None): continue
-                    if(compare(c1, comp, row[c1_key])): table.insert(row)
+                    if(compare(c1, comp, row[c2_key])): table.insert(row)
         else:
             raise SyntaxError("Wrong condition setting.")
     else:
@@ -277,4 +277,3 @@ def Btree(R, C1):
     key = find_index(C1, R.column)
     for Ri in range(0, R.size):
         R.bptree[C1].insert(R.data[Ri][key], Ri)
-        

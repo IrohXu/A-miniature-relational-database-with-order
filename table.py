@@ -1,9 +1,11 @@
 # -----------------------------------------------------------------------------
 # xc2057
 # table.py
+# including inputfromfile, output, outputtofile
 # -----------------------------------------------------------------------------
 
 import re
+import os
 
 class Table():
     def __init__(self, column):
@@ -43,10 +45,14 @@ def outputtable(table):  # table is a table class
         standardout = '|'.join([str(x) for x in info])
         print(standardout)
 
-def outputtofile(table):  # table is a table class
-    standardout = '|'.join(table.column)
-    print(standardout)
-    for info in table.data:
-        if info == None: continue
-        standardout = '|'.join([str(x) for x in info])
-        print(standardout)
+def outputtofile(table, output_path):  # table is a table class
+    if(os.path.exists(output_path)):
+        os.remove(output_path)
+    with open(output_path ,'w') as f:
+        column = '|'.join(table.column)
+        f.write(column)
+        for info in table.data:
+            if info == None: continue
+            data = '|'.join([str(x) for x in info])
+            f.write("\n"+data)
+      

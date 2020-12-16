@@ -1,12 +1,12 @@
 # -----------------------------------------------------------------------------
 # xc2057
 # Bptree.py
+# B+ tree has insert, search, delete operation. 
+# In our project, we only use insert and search.
 # -----------------------------------------------------------------------------
-
 
 from bisect import bisect_right,bisect_left
 from tree_node import leaf_node, inter_node
-import re
 
 class Bplus_Tree(object):
     def __init__(self, k):

@@ -1,8 +1,10 @@
 # -----------------------------------------------------------------------------
 # xc2057
 # operation.py
+# including different operation:
+# project, select, sort, concat, column_sum, column_avg, sumgroup, avggroup, 
+# join, movsum, movavg, Hash, Btree
 # -----------------------------------------------------------------------------
-
 
 from table import Table
 from hash import hashing
@@ -220,23 +222,50 @@ def join(R, Rname, S, Sname, condition):
     if(re.split(r'_', c1)[0] == Rname and re.split(r'_', c2)[0] == Sname):
         c1_key = find_index(re.split(r'_', c1)[1], R.column)
         c2_key = find_index(re.split(r'_', c2)[1], S.column)
-
-        for Rdata in R.data:
-            if(Rdata == None): continue
-            for Sdata in S.data:
-                if(Sdata == None): continue
-                if(compare(Rdata[c1_key], comp, Sdata[c2_key])):
-                    table.insert(Rdata + Sdata)
+        if(comp in ['=', '=='] and (R.hash[R.column[c1_key]] != None or S.hash[S.column[c2_key]] != None)):    # Use hash
+            if(R.hash[R.column[c1_key]] != None):
+                for Sdata in S.data:
+                    if(Sdata == None): continue
+                    R_list = R.hash[R.column[c1_key]].search(Sdata[c2_key])
+                    for pointer in R_list:
+                        table.insert(R.data[pointer] + Sdata)
+            else:
+                for Rdata in R.data:
+                    if(Rdata == None): continue
+                    S_list = S.hash[S.column[c2_key]].search(Rdata[c1_key])
+                    for pointer in S_list:
+                        table.insert(Rdata + S.data[pointer])
+        else:
+            for Rdata in R.data:
+                if(Rdata == None): continue
+                for Sdata in S.data:
+                    if(Sdata == None): continue
+                    if(compare(Rdata[c1_key], comp, Sdata[c2_key])):
+                        table.insert(Rdata + Sdata)
     elif(re.split(r'_', c1)[0] == Sname and re.split(r'_', c2)[0] == Rname):
         c1_key = find_index(re.split(r'_', c1)[1], S.column)
         c2_key = find_index(re.split(r'_', c2)[1], R.column)
 
-        for Rdata in R.data:
-            if(Rdata == None): continue
-            for Sdata in S.data:
-                if(Sdata == None): continue
-                if(compare(Sdata[c1_key], comp, Rdata[c2_key])):
-                    table.insert(Rdata + Sdata)
+        if(comp in ['=', '=='] and (R.hash[R.column[c2_key]] != None or S.hash[S.column[c1_key]] != None)):    # Use hash
+            if(R.hash[R.column[c2_key]] != None):
+                for Sdata in S.data:
+                    if(Sdata == None): continue
+                    R_list = R.hash[R.column[c2_key]].search(Sdata[c1_key])
+                    for pointer in R_list:
+                        table.insert(R.data[pointer] + Sdata)
+            else:
+                for Rdata in R.data:
+                    if(Rdata == None): continue
+                    S_list = S.hash[S.column[c1_key]].search(Rdata[c2_key])
+                    for pointer in S_list:
+                        table.insert(Rdata + S.data[pointer])
+        else:
+            for Rdata in R.data:
+                if(Rdata == None): continue
+                for Sdata in S.data:
+                    if(Sdata == None): continue
+                    if(compare(Sdata[c1_key], comp, Rdata[c2_key])):
+                        table.insert(Rdata + Sdata)
     else:
         raise SyntaxError("Wrong condition setting.")
     return table
@@ -285,3 +314,4 @@ def Btree(R, C1):
     key = find_index(C1, R.column)
     for Ri in range(0, R.size):
         R.bptree[C1].insert(R.data[Ri][key], Ri)
+        

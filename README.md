@@ -7,6 +7,6 @@ My miniature relational database's parser and compiler is based on pandas_parser
 The operation is based on Prof. Wang's note.  
 
 All of the code is written by myself except for the code in folder sly, which is contained in pandas_parser.
-All of the python package in my code is legal, they are: re, bisect, time. Do not include any SOL library!
+All of the python package in my code is legal, they are: re, bisect, time. Do not include any SQL library!
 
 Run 'python compiler.py', you can start to test this project.  
